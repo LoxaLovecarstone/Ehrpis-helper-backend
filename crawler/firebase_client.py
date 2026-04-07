@@ -1,6 +1,5 @@
 import firebase_admin
-from firebase_admin import credentials, firestore
-
+from firebase_admin import credentials, firestore, messaging
 _initialized = False
 
 def get_db():
@@ -32,3 +31,23 @@ def save_coupon(post: dict):
         "notified": False,
     })
     print(f"저장 완료: {post['title']}")
+
+
+
+
+def send_fcm_notification(post: dict):
+    """FCM 토픽으로 푸시 발송"""
+    message = messaging.Message(
+        notification=messaging.Notification(
+            title="🎫 새 쿠폰 도착!",
+            body=f"{post['coupons'][0]} | {post['expiry']['end']}까지",
+        ),
+        data={
+            "feed_id": str(post["feed_id"]),
+            "coupons": ",".join(post["coupons"]),
+            "link": post["link"],
+        },
+        topic="coupons",
+    )
+    messaging.send(message)
+    print(f"FCM 발송 완료: {post['title']}")

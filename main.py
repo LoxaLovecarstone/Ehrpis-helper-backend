@@ -1,6 +1,6 @@
 import asyncio
 from crawler.coupon_crawler import fetch_coupon_posts
-from crawler.firebase_client import is_already_saved, save_coupon
+from crawler.firebase_client import is_already_saved, save_coupon, send_fcm_notification
 
 
 async def main():
@@ -15,9 +15,10 @@ async def main():
     for post in posts:
         if is_already_saved(post["feed_id"]):
             print(f"이미 저장됨 → 이후는 스킵")
-            break  # 여기서 멈춤 (최신순 정렬이라 이미 저장된 거 나오면 끝)
+            break
 
         save_coupon(post)
+        send_fcm_notification(post)
         new_count += 1
 
     print(f"\n완료: 신규 {new_count}개 저장")
