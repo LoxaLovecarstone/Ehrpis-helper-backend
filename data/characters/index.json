@@ -1,4 +1,5 @@
-{
+[
+  {
   "id": 638318,
   "name_ko": "고스트 사무라이",
   "name_en": "Ghostsamurai",
@@ -8,4 +9,5 @@
   "element_id": 2,
   "role_id": 2,
   "icon_url": ""
-}
+  }
+]
