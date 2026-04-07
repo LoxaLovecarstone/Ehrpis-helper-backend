@@ -36,18 +36,25 @@ def save_coupon(post: dict):
 
 
 def send_fcm_notification(post: dict):
-    """FCM 토픽으로 푸시 발송"""
     message = messaging.Message(
         notification=messaging.Notification(
             title="🎫 새 쿠폰 도착!",
-            body=f"{post['coupons'][0]} | {post['expiry']['end']}까지",
+            body=f"{', '.join(post['coupons'])}  |  {post['expiry']['end']}까지",
         ),
         data={
+            "route": "coupon_list",
             "feed_id": str(post["feed_id"]),
             "coupons": ",".join(post["coupons"]),
+            "expiry_end": post["expiry"]["end"] or "",
             "link": post["link"],
         },
         topic="coupons",
+        android=messaging.AndroidConfig(
+            priority="high",
+            notification=messaging.AndroidNotification(
+                click_action="OPEN_COUPON_LIST",
+            ),
+        ),
     )
     messaging.send(message)
     print(f"FCM 발송 완료: {post['title']}")
