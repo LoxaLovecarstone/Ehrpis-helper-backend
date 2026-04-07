@@ -1,0 +1,33 @@
+name: 쿠폰 크롤러
+
+on:
+  schedule:
+    # 한국시간 10:00 = UTC 01:00
+    - cron: '0 1 * * *'
+    # 한국시간 10:30 = UTC 01:30
+    - cron: '30 1 * * *'
+    # 한국시간 11:00 = UTC 02:00
+    - cron: '0 2 * * *'
+    # 한국시간 11:30 = UTC 02:30
+    - cron: '30 2 * * *'
+  workflow_dispatch:  # 수동 실행 버튼도 생김
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python 세팅
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: 패키지 설치
+        run: pip install -r requirements.txt
+
+      - name: Firebase 키 파일 생성
+        run: echo '${{ secrets.FIREBASE_KEY }}' > serviceAccountKey.json
+
+      - name: 크롤러 실행
+        run: python main.py
