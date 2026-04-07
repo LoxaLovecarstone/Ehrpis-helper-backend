@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "name_ko": "수",
+    "color": "#4A90D9"
+  },
+  {
+    "id": 2,
+    "name_ko": "화",
+    "color": "#E85D30"
+  },
+  {
+    "id": 3,
+    "name_ko": "목",
+    "color": "#5BAD6F"
+  },
+  {
+    "id": 4,
+    "name_ko": "암",
+    "color": "#7B5EA7"
+  },
+  {
+    "id": 5,
+    "name_ko": "광",
+    "color": "#E8C84A"
+  }
+]

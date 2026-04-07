@@ -1,0 +1,85 @@
+[
+  {
+    "id": "brave",
+    "name_ko": "용맹",
+    "effects": [
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "atk_percent", "value": 0.15, "condition": null },
+      { "required_count": 3, "effect_type": "skill_dmg", "target_skill_type": "normal", "value": 0.10, "condition": null }
+    ]
+  },
+  {
+    "id": "rampage",
+    "name_ko": "광폭",
+    "effects": [
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "atk_percent", "value": 0.15, "condition": null },
+      { "required_count": 3, "effect_type": "skill_dmg", "target_skill_type": "battle", "value": 0.30, "condition": null }
+    ]
+  },
+  {
+    "id": "flame",
+    "name_ko": "불꽃",
+    "effects": [
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "atk_percent", "value": 0.15, "condition": null },
+      { "required_count": 3, "effect_type": "skill_dmg", "target_skill_type": "fever", "value": 0.30, "condition": null }
+    ]
+  },
+  {
+    "id": "earth",
+    "name_ko": "대지",
+    "effects": [
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "hp_percent", "value": 0.15, "condition": null },
+      { "required_count": 3, "effect_type": "dmg_reduction", "target_stat": "hp", "value": 0.005, "per": 500, "max": 0.30, "condition": null }
+    ]
+  },
+  {
+    "id": "revival",
+    "name_ko": "소생",
+    "effects": [
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "heal_percent", "value": 0.20, "condition": null },
+      { "required_count": 3, "effect_type": "heal_dot", "value": 0.07, "duration": 3, "condition": "target_hp_below_50" }
+    ]
+  },
+  {
+    "id": "unbeaten",
+    "name_ko": "불패",
+    "effects": [
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "shield_percent", "value": 0.30, "condition": null },
+      { "required_count": 3, "effect_type": "dmg_bonus_stack", "value": 0.10, "per_shield": 1000, "max_stacks": 5, "condition": null }
+    ]
+  },
+  {
+    "id": "guidance",
+    "name_ko": "인도",
+    "effects": [
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "def_percent", "value": 0.10, "condition": null },
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "hp_percent", "value": 0.10, "condition": null },
+      { "required_count": 3, "effect_type": "team_dmg_bonus", "target_class_id": 2, "value": 0.10, "stackable": false, "condition": "battle_start" }
+    ]
+  },
+  {
+    "id": "ruin",
+    "name_ko": "괴멸",
+    "effects": [
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "hp_percent", "value": 0.10, "condition": null },
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "atk_percent", "value": 0.05, "condition": null },
+      { "required_count": 3, "effect_type": "team_dmg_bonus", "target_class_id": 3, "value": 0.10, "stackable": false, "condition": "battle_start" }
+    ]
+  },
+  {
+    "id": "bisaek",
+    "name_ko": "비색",
+    "effects": [
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "hp_percent", "value": 0.10, "condition": null },
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "atk_spd_percent", "value": 0.05, "condition": null },
+      { "required_count": 3, "effect_type": "team_dmg_bonus", "target_class_id": 4, "value": 0.10, "stackable": false, "condition": "battle_start" }
+    ]
+  },
+  {
+    "id": "origin",
+    "name_ko": "근원",
+    "effects": [
+      { "required_count": 2, "effect_type": "stat_bonus", "target_stat": "dot_percent", "value": 0.50, "condition": null },
+      { "required_count": 3, "effect_type": "dmg_bonus", "value": 0.30, "condition": "fever_and_target_has_dot" }
+    ]
+  }
+]

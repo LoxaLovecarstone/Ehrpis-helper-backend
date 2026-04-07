@@ -1,0 +1,106 @@
+{
+  "id": 638318,
+  "name_ko": "고스트 사무라이",
+  "name_en": "Ghostsamurai",
+  "name_cn": "鬼侍",
+  "rarity": 5,
+  "class_id": 1,
+  "element_id": 2,
+  "role_id": 2,
+  "icon_url": "",
+  "stats": {
+    "atk": 43,  "atk_max": 762,
+    "def": 56,  "def_max": 835,
+    "hp": 3112, "hp_max": 17937,
+    "crit_rate": 0.05, "crit_dmg": 0.30,
+    "block_rate": 0.05, "block_reduction": 0.30,
+    "dodge_rate": 0.0,
+    "move_spd": 90, "atk_spd": 2567, "range": 50, "heal_power": 0.0
+  },
+  "skills": [
+    {
+      "id": "638318_normal",
+      "type": "normal",
+      "name": "강타",
+      "hits": 1,
+      "multipliers": [{ "stat": "atk", "base_type": "total", "ratio": 1.00 }],
+      "effects": []
+    },
+    {
+      "id": "638318_battle",
+      "type": "battle",
+      "name": "근원 장악",
+      "hits": 0,
+      "multipliers": [],
+      "effects": [
+        {
+          "type": "heal",
+          "target": "ally_lowest_hp",
+          "condition": "ally_hp_below_50",
+          "stat": "hp",
+          "base_type": "total",
+          "ratio": 0.065,
+          "flat": 1000,
+          "max_charges": 3,
+          "charge_interval_sec": 7
+        }
+      ]
+    },
+    {
+      "id": "638318_fever",
+      "type": "fever",
+      "name": "혼의 공명",
+      "cooldown_sec": 45,
+      "hits": 1,
+      "multipliers": [{ "stat": "atk", "base_type": "total", "ratio": 9.00 }],
+      "effects": [
+        {
+          "type": "shield",
+          "target": "ally_all",
+          "source": "resonance_value",
+          "duration": 8,
+          "note": "공명치 100% → 마음의 벽 변환, 생존 아군 균등 분배. 마음의 벽 보유 시 피해 감소 10%"
+        },
+        {
+          "type": "heal_dot",
+          "target": "ally_lowest_hp_4",
+          "stat": "hp",
+          "base_type": "total",
+          "ratio": 0.05,
+          "flat": 500,
+          "duration": 5
+        }
+      ]
+    }
+  ],
+  "passives": [
+    { "id": "638318_passive1", "name": "보호 강화", "effect_type": "stat_bonus", "target_stat": "def", "value_type": "flat", "value": 165 },
+    { "id": "638318_passive2", "name": "굳건한 투지", "effect_type": "stat_bonus", "target_stat": "block_rate", "value_type": "percent", "value": 0.15 },
+    { "id": "638318_passive3", "name": "신체 능력 돌파", "effect_type": "stat_bonus", "target_stat": "hp", "value_type": "flat", "value": 1728 }
+  ],
+  "awakenings": [
+    { "step": 1, "name_cn": "鬥志激昂", "effect_type": "stat_bonus",
+      "target_stat": "hp", "value_type": "flat", "value": 1002, "condition": null,
+      "description": "체력 +1002" },
+    { "step": 2, "name_cn": "潛能激發", "effect_type": "skill_level",
+      "target_stat": null, "value_type": null, "value": 1, "condition": "battle_and_fever",
+      "description": "전투 스킬 +1, 피버 스킬 +1" },
+    { "step": 3, "name_cn": "啓示", "effect_type": "passive",
+      "target_stat": null, "value_type": "percent", "value": 0.50, "condition": "battle_start",
+      "description": "전투 시작 시 최대 체력의 50% 마음의 벽 획득 (10초 지속). 마음의 벽 보유 시 피해 감소 +10%" },
+    { "step": 4, "name_cn": "不朽之輝", "effect_type": "stat_bonus",
+      "target_stat": "hp", "value_type": "flat", "value": 1441, "condition": null,
+      "description": "체력 +1441" },
+    { "step": 5, "name_cn": "本源共鳴", "effect_type": "skill_level",
+      "target_stat": null, "value_type": null, "value": 1, "condition": "battle_and_fever",
+      "description": "전투 스킬 +1, 피버 스킬 +1" }
+  ],
+  "badge_recommendation": "revival",
+  "leader_skill": {
+    "condition": "fever",
+    "effects": [
+      { "effect_type": "stat_bonus", "target_stat": "atk_percent", "value": 0.05, "target": "ally_all" },
+      { "effect_type": "stat_bonus", "target_stat": "heal_percent", "value": 0.15, "target": "ally_all" }
+    ]
+  }
+}
