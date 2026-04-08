@@ -1,3 +1,5 @@
+from html import unescape
+import emoji
 import httpx
 from bs4 import BeautifulSoup
 import re
@@ -10,6 +12,13 @@ HEADERS = {
 
 LIST_API = "https://comm-api.game.naver.com/nng_main/v1/community/lounge/Ehrpis/feed?boardId=25&buffFilteringYN=N&limit=25&offset=0&order=NEW"
 DETAIL_API = "https://comm-api.game.naver.com/nng_main/v1/community/lounge/Ehrpis/feed/{feed_id}"
+
+
+def clean_title(title: str) -> str:
+    """HTML 엔티티 디코딩 후 이모지 제거 및 공백 정리"""
+    title = unescape(title)
+    title = emoji.replace_emoji(title, replace="")
+    return title.strip()
 
 
 def is_coupon_post(title: str) -> bool:
@@ -81,7 +90,7 @@ async def fetch_coupon_posts() -> list[dict]:
 
             for item in feeds:
                 feed = item["feed"]
-                title = feed.get("title", "")
+                title = clean_title(feed.get("title", ""))
 
                 if not is_coupon_post(title):
                     continue
