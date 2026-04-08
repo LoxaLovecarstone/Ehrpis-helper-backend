@@ -53,6 +53,9 @@ def send_fcm_notification(post: dict):
             priority="high",
             notification=messaging.AndroidNotification(
                 click_action="OPEN_COUPON_LIST",
+                channel_id="coupon_channel",
+                default_sound=True,
+                default_vibrate_timings=True,
             ),
         ),
     )

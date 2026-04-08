@@ -29,11 +29,14 @@ def send_test_notification():
             "feed_id": str(dummy_post["feed_id"]),
             "link": dummy_post["link"],
         },
-        topic="coupons", # 앱에서 구독 중인 토픽 이름
+        topic="coupons",
         android=messaging.AndroidConfig(
             priority="high",
             notification=messaging.AndroidNotification(
-                click_action="OPEN_COUPON_LIST", # 앱 manifest와 일치해야 함
+                click_action="OPEN_COUPON_LIST",
+                channel_id="coupon_channel",  # 앱의 CHANNEL_ID와 일치
+                default_sound=True,
+                default_vibrate_timings=True,
             ),
         ),
     )
