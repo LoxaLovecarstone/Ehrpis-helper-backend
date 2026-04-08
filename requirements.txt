@@ -2,3 +2,4 @@ httpx
 firebase-admin
 python-dotenv
 beautifulsoup4
+emoji
