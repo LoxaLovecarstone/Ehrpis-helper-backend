@@ -1,7 +1,7 @@
-# 에르피스 헬퍼 앱 - 백엔드
+# 에르피스 도우미 앱 - 백엔드
 
 ## 프로젝트 개요
-에르피스(Ehrpis) 모바일 게임 헬퍼 앱 백엔드.
+에르피스(Ehrpis) 모바일 게임 도우미 앱 백엔드.
 서버리스 구조: GitHub Actions + Firebase (Firestore + FCM)
 
 ## 레포 정보
