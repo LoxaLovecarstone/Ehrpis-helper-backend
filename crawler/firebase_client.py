@@ -35,6 +35,46 @@ def save_coupon(post: dict):
 
 
 
+def is_event_seen(feed_id: int) -> bool:
+    """이미 처리한 이벤트 게시물인지 확인"""
+    db = get_db()
+    doc = db.collection("event_seen").document(str(feed_id)).get()
+    return doc.exists
+
+
+def mark_event_seen(feed_id: int, title: str):
+    """이벤트 게시물을 처리 완료로 기록"""
+    db = get_db()
+    db.collection("event_seen").document(str(feed_id)).set({
+        "feed_id": feed_id,
+        "title": title,
+    })
+
+
+def send_event_fcm_notification(post: dict):
+    message = messaging.Message(
+        notification=messaging.Notification(
+            title="[테스트] 새 이벤트 게시물",
+            body=post["title"],
+        ),
+        data={
+            "feed_id": str(post["feed_id"]),
+            "link": post["link"],
+        },
+        topic="test",
+        android=messaging.AndroidConfig(
+            priority="high",
+            notification=messaging.AndroidNotification(
+                channel_id="coupon_channel",
+                default_sound=True,
+                default_vibrate_timings=True,
+            ),
+        ),
+    )
+    messaging.send(message)
+    print(f"FCM 발송 완료 (test topic): {post['title']}")
+
+
 def send_fcm_notification(post: dict):
     message = messaging.Message(
         notification=messaging.Notification(
