@@ -61,3 +61,46 @@ def send_fcm_notification(post: dict):
     )
     messaging.send(message)
     print(f"FCM 발송 완료: {post['title']}")
+
+
+"""
+파이썬 콘솔에서 다음을 실행해서 테스트
+from importlib import reload                                                                                                                                    
+import crawler.firebase_client as fc
+reload(fc)                                                                                                                                                      
+fc.test_fcm_notification()  
+"""
+def test_fcm_notification():
+    get_db()  # Firebase 초기화
+    post = {
+        "feed_id": 99999,
+        "title": "[리딤] 테스트 쿠폰",
+        "coupons": ["TESTCODE123"],
+        "expiry": {"start": "2026-04-13", "end": "2026-12-31 23:59"},
+        "link": "https://game.naver.com/lounge/Ehrpis/board/25",
+    }
+    message = messaging.Message(
+        notification=messaging.Notification(
+            title="🎫 새 쿠폰 도착!",
+            body=f"{', '.join(post['coupons'])}  |  {post['expiry']['end']}까지",
+        ),
+        data={
+            "route": "coupon_list",
+            "feed_id": str(post["feed_id"]),
+            "coupons": ",".join(post["coupons"]),
+            "expiry_end": post["expiry"]["end"] or "",
+            "link": post["link"],
+        },
+        topic="coupons",
+        android=messaging.AndroidConfig(
+            priority="high",
+            notification=messaging.AndroidNotification(
+                click_action="OPEN_COUPON_LIST",
+                channel_id="coupon_channel",
+                default_sound=True,
+                default_vibrate_timings=True,
+            ),
+        ),
+    )
+    messaging.send(message)
+    print(f"FCM 발송 완료: {post['title']}")
