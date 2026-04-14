@@ -46,26 +46,30 @@ def extract_expiry(html: str) -> dict:
     soup = BeautifulSoup(html, "html.parser")
     text = soup.get_text()
 
-    match = re.search(r'보상 수령 기간\s*[:\s]*([\d\-]+)\s*~\s*([\d\-\s:]+)', text)
+    match = re.search(r'보상 수령 기간\s*[:\s]*([\d\-\.]+)\s*~\s*([\d\-\.\s:]+)', text)
     if not match:
         return {"start": None, "end": None}
 
     start_str = match.group(1).strip()
     end_str = match.group(2).strip()
 
-    # 날짜 파싱
-    try:
-        start = datetime.strptime(start_str, "%Y-%m-%d")
-    except ValueError:
-        start = None
+    # 날짜 파싱 (대시: 2026-04-08, 점: 2026.04.08 두 형태 모두 처리)
+    start = None
+    for fmt in ["%Y-%m-%d", "%Y.%m.%d"]:
+        try:
+            start = datetime.strptime(start_str, fmt)
+            break
+        except ValueError:
+            continue
 
-    # 종료일은 "2026-04-08 23:59" 또는 "2026-08-05" 두 형태
-    for fmt in ["%Y-%m-%d %H:%M", "%Y-%m-%d"]:
+    # 종료일은 "2026-04-08 23:59" / "2026.05.14 23:59" / "2026-08-05" / "2026.08.05" 형태
+    end = None
+    for fmt in ["%Y-%m-%d %H:%M", "%Y.%m.%d %H:%M", "%Y-%m-%d", "%Y.%m.%d"]:
         try:
             end = datetime.strptime(end_str, fmt)
             break
         except ValueError:
-            end = None
+            continue
 
     return {
         "start": start.strftime("%Y-%m-%d") if start else None,
