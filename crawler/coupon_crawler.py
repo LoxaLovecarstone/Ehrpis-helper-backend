@@ -41,6 +41,14 @@ def extract_coupons_from_html(html: str) -> list[str]:
     return all_codes
 
 
+GACHA_ITEMS = ["오팔", "운명의 그림자", "기적의 그림자"]
+
+
+def extract_reward_types(html: str) -> list[str]:
+    types = [item for item in GACHA_ITEMS if item in html]
+    return types if types else ["기타"]
+
+
 def extract_expiry(html: str) -> dict:
     """보상 수령 기간 추출 → 시작일/종료일 분리"""
     soup = BeautifulSoup(html, "html.parser")
@@ -80,11 +88,11 @@ def extract_expiry(html: str) -> dict:
 async def fetch_coupon_posts() -> list[dict]:
     async with httpx.AsyncClient(headers=HEADERS) as client:
         coupon_posts = []
-        offset = 0
+        page_offset = 0
         limit = 25
 
         while True:
-            url = f"https://comm-api.game.naver.com/nng_main/v1/community/lounge/Ehrpis/feed?boardId=25&buffFilteringYN=N&limit={limit}&offset={offset}&order=NEW"
+            url = f"https://comm-api.game.naver.com/nng_main/v1/community/lounge/Ehrpis/feed?boardId=25&buffFilteringYN=N&limit={limit}&offset={page_offset}&order=NEW"
             resp = await client.get(url)
             resp.raise_for_status()
             data = resp.json()["content"]
@@ -110,18 +118,20 @@ async def fetch_coupon_posts() -> list[dict]:
                 contents_html = detail.get("contents", "")
                 coupons = extract_coupons_from_html(contents_html)
                 expiry = extract_expiry(contents_html)
+                reward_types = extract_reward_types(contents_html)
 
                 coupon_posts.append({
                     "feed_id": feed_id,
                     "title": title,
                     "coupons": coupons,
                     "expiry": expiry,
+                    "reward_types": reward_types,
                     "created_date": feed.get("createdDate"),
                     "link": item["feedLink"]["pc"],
                 })
 
-            offset += limit
-            if offset >= total:
+            page_offset += 1
+            if len(feeds) < limit:
                 break
 
         return coupon_posts

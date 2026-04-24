@@ -27,6 +27,7 @@ def save_coupon(post: dict):
         "expiry_start": post["expiry"]["start"],  # "2026-02-05"
         "expiry_end": post["expiry"]["end"],       # "2026-08-05 23:59"
         "link": post["link"],
+        "reward_types": post.get("reward_types", []),
         "created_date": post["created_date"],
         "notified": False,
     })
