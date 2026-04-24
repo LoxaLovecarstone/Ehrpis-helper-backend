@@ -1,0 +1,26 @@
+name: 만료 쿠폰 삭제
+
+on:
+  schedule:
+    - cron: '0 16 * * *'  # 매일 01:00 KST
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python 세팅
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: 패키지 설치
+        run: pip install -r requirements.txt
+
+      - name: Firebase 키 파일 생성
+        run: echo '${{ secrets.FIREBASE_KEY }}' > serviceAccountKey.json
+
+      - name: 만료 쿠폰 삭제
+        run: python scripts/cleanup_expired_coupons.py
