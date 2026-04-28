@@ -10,7 +10,7 @@ HEADERS = {
     "Referer": "https://game.naver.com/lounge/Ehrpis/board/25",
 }
 
-LIST_API = "https://comm-api.game.naver.com/nng_main/v1/community/lounge/Ehrpis/feed?boardId=25&buffFilteringYN=N&limit=25&offset=0&order=NEW"
+LIST_API = "https://comm-api.game.naver.com/nng_main/v1/community/lounge/Ehrpis/feed?boardId=25&buffFilteringYN=N&limit={limit}&offset={offset}&order=NEW"
 DETAIL_API = "https://comm-api.game.naver.com/nng_main/v1/community/lounge/Ehrpis/feed/{feed_id}"
 
 
@@ -92,7 +92,7 @@ async def fetch_coupon_posts() -> list[dict]:
         limit = 25
 
         while True:
-            url = f"https://comm-api.game.naver.com/nng_main/v1/community/lounge/Ehrpis/feed?boardId=25&buffFilteringYN=N&limit={limit}&offset={page_offset}&order=NEW"
+            url = LIST_API.format(limit=limit, offset=page_offset)
             resp = await client.get(url)
             resp.raise_for_status()
             data = resp.json()["content"]
