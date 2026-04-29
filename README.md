@@ -30,7 +30,7 @@
         └─▶ FCM topic "coupons" 발송
 
 [cleanup.yml]
-  매일 KST 01:00 → 만료된 쿠폰 Hard Delete
+  매일 KST 00:00 → 만료된 쿠폰 Hard Delete
 ```
 
 ---
@@ -55,7 +55,7 @@ Ehrpis-helper-backend/
 ├── .github/
 │   └── workflows/
 │       ├── crawl.yml               ← 쿠폰 크롤링 스케줄 (매일 5회)
-│       └── cleanup.yml             ← 만료 쿠폰 삭제 스케줄 (매일 KST 01:00)
+│       └── cleanup.yml             ← 만료 쿠폰 삭제 스케줄 (매일 KST 00:00)
 ├── crawler/
 │   ├── coupon_crawler.py           ← 네이버 라운지 크롤링 + 파싱
 │   └── firebase_client.py          ← Firestore 저장 + FCM 발송
