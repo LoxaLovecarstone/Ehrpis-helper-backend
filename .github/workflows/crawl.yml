@@ -8,7 +8,7 @@ on:
     - cron: '7 2 * * *'
     - cron: '37 2 * * *'
     - cron: '7 8 * * *'
-  workflow_dispatch:  # 수동 실행 버튼도 생김
+  workflow_dispatch:
 
 jobs:
   crawl:
@@ -26,11 +26,8 @@ jobs:
 
       - name: Firebase 키 파일 생성
         run: |
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            echo '${{ secrets.FIREBASE_KEY }}' > serviceAccountKey.json
-          else
-            echo '${{ secrets.FIREBASE_KEY_DEV }}' > serviceAccountKey.json
-          fi
+          echo '${{ secrets.FIREBASE_KEY }}' > serviceAccountKey.json
+          echo '${{ secrets.FIREBASE_KEY_DEV }}' > serviceAccountKey_dev.json
 
       - name: 크롤러 실행
         run: python main.py

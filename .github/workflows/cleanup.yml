@@ -21,11 +21,8 @@ jobs:
 
       - name: Firebase 키 파일 생성
         run: |
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            echo '${{ secrets.FIREBASE_KEY }}' > serviceAccountKey.json
-          else
-            echo '${{ secrets.FIREBASE_KEY_DEV }}' > serviceAccountKey.json
-          fi
+          echo '${{ secrets.FIREBASE_KEY }}' > serviceAccountKey.json
+          echo '${{ secrets.FIREBASE_KEY_DEV }}' > serviceAccountKey_dev.json
 
       - name: 만료 쿠폰 삭제
         run: python scripts/cleanup_expired_coupons.py
