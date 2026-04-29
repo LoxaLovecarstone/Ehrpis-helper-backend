@@ -25,7 +25,12 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Firebase 키 파일 생성
-        run: echo '${{ secrets.FIREBASE_KEY }}' > serviceAccountKey.json
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo '${{ secrets.FIREBASE_KEY }}' > serviceAccountKey.json
+          else
+            echo '${{ secrets.FIREBASE_KEY_DEV }}' > serviceAccountKey.json
+          fi
 
       - name: 크롤러 실행
         run: python main.py
