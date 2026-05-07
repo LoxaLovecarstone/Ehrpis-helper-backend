@@ -10,7 +10,7 @@ from firebase_admin import credentials, firestore
 
 KEY_FILES = [
     # !!! main 머지 전 반드시 주석 해제 !!!
-    # ("serviceAccountKey.json", "prod"),
+    ("serviceAccountKey.json", "prod"),
     ("serviceAccountKey_dev.json", "dev"),
 ]
 
