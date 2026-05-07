@@ -1,7 +1,7 @@
 import asyncio
 import os
 from crawler.coupon_crawler import fetch_coupon_posts
-from crawler.firebase_client import init_app, get_db, is_already_saved, save_coupon, send_fcm_notification
+from crawler.firebase_client import init_app, get_db, is_already_saved, is_coupon_expired, save_coupon, send_fcm_notification
 
 KEY_FILES = [
     ("serviceAccountKey.json", "prod"),
@@ -27,6 +27,10 @@ async def main():
 
     new_count = 0
     for post in posts:
+        if is_coupon_expired(post["expiry"]["end"]):
+            print(f"만료된 쿠폰 스킵: {post['title']}")
+            continue
+
         if is_already_saved(post["feed_id"], prod_db):
             print("이미 저장됨 → 이후는 스킵")
             break

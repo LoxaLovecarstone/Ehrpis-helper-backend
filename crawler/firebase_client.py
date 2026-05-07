@@ -1,5 +1,9 @@
+from datetime import datetime, timezone, timedelta
+
 import firebase_admin
 from firebase_admin import credentials, firestore, messaging
+
+KST = timezone(timedelta(hours=9))
 
 _apps: dict = {}
 
@@ -15,6 +19,16 @@ def init_app(key_file: str, name: str) -> firebase_admin.App:
 
 def get_db(app: firebase_admin.App):
     return firestore.client(app=app)
+
+
+def is_coupon_expired(expiry_end: str | None) -> bool:
+    if not expiry_end:
+        return False
+    try:
+        dt = datetime.strptime(expiry_end, "%Y-%m-%d %H:%M").replace(tzinfo=KST)
+        return dt < datetime.now(KST)
+    except ValueError:
+        return False
 
 
 def is_already_saved(feed_id: int, db) -> bool:
