@@ -18,7 +18,8 @@ DUMMY_POST = {
 }
 
 KEY_FILES = [
-    ("serviceAccountKey.json", "prod"),
+    # !!! main 머지 전 반드시 주석 해제 !!!
+    # ("serviceAccountKey.json", "prod"),
     ("serviceAccountKey_dev.json", "dev"),
 ]
 
