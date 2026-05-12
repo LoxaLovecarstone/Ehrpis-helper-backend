@@ -50,16 +50,21 @@ def extract_reward_types(html: str) -> list[str]:
 
 
 def extract_expiry(html: str) -> dict:
-    """보상 수령 기간 추출 → 시작일/종료일 분리"""
+    """보상 수령 기간 / 쿠폰 사용 기간 추출 → 시작일/종료일 분리"""
     soup = BeautifulSoup(html, "html.parser")
     text = soup.get_text()
 
-    match = re.search(r'보상 수령 기간\s*[:\s]*([\d\-\.]+)\s*~\s*([\d\-\.\s:]+)', text)
+    match = re.search(
+        r'(?:보상 수령 기간|쿠폰 사용 기간)\s*[:\s]*'
+        r'([\d\-.]+(?:\([가-힣]+\))?)\s*~\s*([\d\-.:\s()가-힣]+?)(?:\s*까지)?(?=\s|$)',
+        text,
+    )
     if not match:
         return {"start": None, "end": None}
 
-    start_str = match.group(1).strip()
-    end_str = match.group(2).strip()
+    # 요일 표기 "(금)" 등 제거
+    start_str = re.sub(r'\([가-힣]+\)', '', match.group(1)).strip()
+    end_str = re.sub(r'\([가-힣]+\)', '', match.group(2)).strip()
 
     # 날짜 파싱 (대시: 2026-04-08, 점: 2026.04.08 두 형태 모두 처리)
     start = None
@@ -70,9 +75,9 @@ def extract_expiry(html: str) -> dict:
         except ValueError:
             continue
 
-    # 종료일은 "2026-04-08 23:59" / "2026.05.14 23:59" / "2026-08-05" / "2026.08.05" 형태
+    # 종료일: 초 단위 포함 형태도 처리
     end = None
-    for fmt in ["%Y-%m-%d %H:%M", "%Y.%m.%d %H:%M", "%Y-%m-%d", "%Y.%m.%d"]:
+    for fmt in ["%Y-%m-%d %H:%M:%S", "%Y.%m.%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y.%m.%d %H:%M", "%Y-%m-%d", "%Y.%m.%d"]:
         try:
             end = datetime.strptime(end_str, fmt)
             break
