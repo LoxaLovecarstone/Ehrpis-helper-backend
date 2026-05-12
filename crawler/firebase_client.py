@@ -53,11 +53,9 @@ def save_coupon(post: dict, db):
 
 def send_fcm_notification(post: dict, app: firebase_admin.App):
     message = messaging.Message(
-        notification=messaging.Notification(
-            title="🎫 새 쿠폰 도착!",
-            body=f"{', '.join(post['coupons'])}  |  {post['expiry']['end']}까지",
-        ),
         data={
+            "title": "🎫 새 쿠폰 도착!",
+            "body": f"{', '.join(post['coupons'])}  |  {post['expiry']['end']}까지",
             "route": "coupon_list",
             "feed_id": str(post["feed_id"]),
             "coupons": ",".join(post["coupons"]),
@@ -67,12 +65,6 @@ def send_fcm_notification(post: dict, app: firebase_admin.App):
         topic="coupons",
         android=messaging.AndroidConfig(
             priority="high",
-            notification=messaging.AndroidNotification(
-                click_action="OPEN_COUPON_LIST",
-                channel_id="coupon_channel",
-                default_sound=True,
-                default_vibrate_timings=True,
-            ),
         ),
     )
     messaging.send(message, app=app)
