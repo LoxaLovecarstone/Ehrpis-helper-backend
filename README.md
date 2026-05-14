@@ -23,11 +23,13 @@
                 → 보상 타입 추출
         │
         ▼
-[firebase_client.py]
+[main.py]
+  만료된 쿠폰 스킵
+        │
   Firestore feed_id 중복 확인
         │  신규이면
-        ├─▶ Firestore coupons 컬렉션 저장
-        └─▶ FCM topic "coupons" 발송
+        ├─▶ [firebase_client.py] Firestore coupons 컬렉션 저장
+        └─▶ [firebase_client.py] FCM topic "coupons" 발송
 
 [cleanup.yml]
   매일 KST 00:00 → 만료된 쿠폰 Hard Delete
@@ -42,6 +44,7 @@
 | 언어 | Python 3.14                    |
 | HTTP 클라이언트 | httpx (비동기)                    |
 | HTML 파싱 | BeautifulSoup4                 |
+| 이모지 처리 | emoji                          |
 | 데이터베이스 | Firebase Firestore             |
 | 푸시 알림 | Firebase Cloud Messaging (FCM) |
 | 스케줄러 | GitHub Actions                 |
@@ -95,8 +98,8 @@ pattern2 = re.findall(r'\b[A-Z][A-Z0-9]{5,19}\b', text)              # 대문자
 ```
 pattern1 우선 적용 후 중복을 제거합니다.
 
-**만료일** — `보상 수령 기간 : 2026-04-06 ~ 2026-04-08 23:59` 패턴으로,
-`YYYY-MM-DD` / `YYYY.MM.DD` 두 형태 모두 파싱합니다.
+**만료일** — `보상 수령 기간` 또는 `쿠폰 사용 기간` 뒤에 오는 날짜 범위를 추출합니다.
+`2026-04-06 ~ 2026-04-08 23:59` 형태이며, `YYYY-MM-DD` / `YYYY.MM.DD` 두 형태 모두 파싱합니다.
 
 **보상 타입** — `오팔`, `운명의 그림자`, `기적의 그림자` 포함 여부로 분류합니다.
 
@@ -131,11 +134,9 @@ Firestore에 `feed_id`가 이미 존재하면 스킵하고 루프를 종료합�
 
 ```json
 {
-  "notification": {
-    "title": "🎫 새 쿠폰 도착!",
-    "body": "GIFTS0406 | 2026-04-08 23:59까지"
-  },
   "data": {
+    "title": "🎫 새 쿠폰 도착!",
+    "body": "GIFTS0406  |  2026-04-08 23:59까지",
     "route": "coupon_list",
     "feed_id": "7508947",
     "coupons": "GIFTS0406",
@@ -144,13 +145,12 @@ Firestore에 `feed_id`가 이미 존재하면 스킵하고 루프를 종료합�
   },
   "topic": "coupons",
   "android": {
-    "priority": "high",
-    "notification": { "click_action": "OPEN_COUPON_LIST" }
+    "priority": "high"
   }
 }
 ```
 
-`notification`은 시스템 트레이 표시용, `data`는 앱 딥링크용으로 분리했습니다.
+`notification` 블록 없이 전부 `data`로만 전송합니다. 앱에서 `data`의 `title` / `body`를 읽어 직접 알림을 구성합니다.
 
 ---
 
@@ -174,6 +174,8 @@ Firestore에 `feed_id`가 이미 존재하면 스킵하고 루프를 종료합�
 
 매일 `15:00 UTC` (KST 00:00). `expiry_end` 기준으로 만료된 도큐먼트를 Firestore batch delete 합니다.
 `soft delete`도 고려하였으나 어차피 만료된 쿠폰을 다시는 사용하지 못하는 점, 무료 요금제를 이용 중이라는 조건에 맞추어 타협하였습니다.
+
+`workflow_dispatch`로 수동 실행도 가능합니다.
 
 ---
 
