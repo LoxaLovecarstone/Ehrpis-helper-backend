@@ -12,8 +12,8 @@
 
 ```
 [GitHub Actions 스케줄러]
-        │  아침: 09:07 KST 시작 → 3분 간격 폴링 → 11:30 종료
-        │  저녁: 16:07 KST 시작 → 3분 간격 폴링 → 18:30 종료
+        │  오전: 09:07 KST 시작 → 3분 간격 폴링 → 11:30 종료
+        │  오후: 16:07 KST 시작 → 3분 간격 폴링 → 18:30 종료
         ▼
 [coupon_crawler.py]
   네이버 라운지 API 목록 조회
@@ -58,7 +58,7 @@
 Ehrpis-helper-backend/
 ├── .github/
 │   └── workflows/
-│       ├── crawl.yml               ← 쿠폰 크롤링 (아침 09:07 / 저녁 16:00 폴링 루프)
+│       ├── crawl.yml               ← 쿠폰 크롤링 (KST 09:07 / 16:07 폴링 루프)
 │       └── cleanup.yml             ← 만료 쿠폰 삭제 스케줄 (매일 KST 00:00)
 ├── crawler/
 │   ├── coupon_crawler.py           ← 네이버 라운지 크롤링 + 파싱
