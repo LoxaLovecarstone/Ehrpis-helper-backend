@@ -174,7 +174,7 @@
     "rarity": 5,
     "class_id": 1,
     "role_ids": [2],
-    "element_id": 0,
+    "element_id": 1,
     "is_limited": false,
     "is_gacha": true,
     "icon_url": "https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/characters/icons/0015.png"
@@ -522,7 +522,7 @@
     "rarity": 4,
     "class_id": 4,
     "role_ids": [1],
-    "element_id": 0,
+    "element_id": 3,
     "is_limited": false,
     "is_gacha": true,
     "icon_url": "https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/characters/icons/0044.png"
