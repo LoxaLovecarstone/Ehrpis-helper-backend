@@ -165,6 +165,18 @@ https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/cha
 https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/common/classes.json
 ```
 
+## 안드로이드 연동 시 참고사항
+
+안드로이드 에이전트에 넘길 때 아래 내용 포함:
+
+- CDN에서 index.json fetch → `is_gacha: true`인 캐릭터만 가챠 풀에 포함
+- `is_limited`로 픽업 배너 구분
+- `icon_url` 직접 사용 (172×172 원형 투명 PNG)
+- `role_ids`는 배열 (복수 역할 허용)
+- 직업/속성/역할 상세는 `data/common/*.json` 별도 fetch
+
+---
+
 ## GitHub Actions
 ```yaml
 # crawl.yml 스케줄 (KST 기준)
