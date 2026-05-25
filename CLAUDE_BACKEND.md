@@ -180,22 +180,37 @@ https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/com
 ## GitHub Actions
 ```yaml
 # crawl.yml 스케줄 (KST 기준)
-- cron: '7 0 * * *'    # 09:07 — 폴링 루프 시작 (11:30 KST까지)
-- cron: '7 8 * * *'    # 17:07 — 저녁 단순 1회 크롤링
+- cron: '7 0 * * *'    # 09:07 — 아침 폴링 루프 (11:30까지)
+- cron: '7 7 * * *'    # 16:07 — 저녁 폴링 루프 (18:30까지)
 
 # cleanup.yml
 - cron: '0 15 * * *'   # KST 00:00
 ```
 
-## 폴링 루프 구조 (main.py — 구현 예정)
+## 폴링 루프 구조 (main.py)
 
-09:07 잡이 시작되면 5분 간격으로 반복 크롤링. 새 쿠폰 발견 시 Firestore 저장 + FCM 발송 후에도 계속 폴링(하루 쿠폰 2개 이상 대비). 기존 feed_id dedup 로직이 중복 알림 차단. 11:30 KST 초과 시 "오늘은 쿠폰 없음"으로 exit.
+잡이 시작되면 3분 간격으로 반복 크롤링. 시작 시각 기준으로 deadline 자동 결정 (12시 전 → 11:30, 이후 → 18:30). 새 쿠폰 발견 시 Firestore 저장 + FCM 발송 후에도 계속 폴링 (하루 쿠폰 2개 이상 대비). feed_id dedup 로직이 중복 알림 차단.
 
 ```python
-KST = datetime.timezone(datetime.timedelta(hours=9))
-DEADLINE = datetime.time(11, 30)
+POLL_INTERVAL = 180  # 3분
 
-while datetime.datetime.now(KST).time() < DEADLINE:
-    await crawl_once()          # 새 쿠폰이면 저장+FCM, 기존이면 dedup으로 스킵
-    await asyncio.sleep(300)    # 5분 간격 (time.sleep 아님 — async 필수)
+now = datetime.datetime.now(KST)
+if now.hour < 12:
+    deadline = now.replace(hour=11, minute=30, ...)
+else:
+    deadline = now.replace(hour=18, minute=30, ...)
+
+while True:
+    await crawl_once()
+    if datetime.datetime.now(KST) >= deadline:
+        break
+    await asyncio.sleep(POLL_INTERVAL)
+```
+
+## DEV_ONLY 환경변수
+
+로컬 테스트 시 prod Firebase 격리용. CI에서는 설정하지 않음.
+
+```cmd
+set DEV_ONLY=true && python main.py
 ```

@@ -12,7 +12,8 @@
 
 ```
 [GitHub Actions 스케줄러]
-        │  매일 5회 (KST 10:07 / 10:37 / 11:07 / 11:37 / 17:07)
+        │  아침: 09:07 KST 시작 → 3분 간격 폴링 → 11:30 종료
+        │  저녁: 16:07 KST 시작 → 3분 간격 폴링 → 18:30 종료
         ▼
 [coupon_crawler.py]
   네이버 라운지 API 목록 조회
@@ -57,7 +58,7 @@
 Ehrpis-helper-backend/
 ├── .github/
 │   └── workflows/
-│       ├── crawl.yml               ← 쿠폰 크롤링 스케줄 (매일 5회)
+│       ├── crawl.yml               ← 쿠폰 크롤링 (아침 09:07 / 저녁 16:00 폴링 루프)
 │       └── cleanup.yml             ← 만료 쿠폰 삭제 스케줄 (매일 KST 00:00)
 ├── crawler/
 │   ├── coupon_crawler.py           ← 네이버 라운지 크롤링 + 파싱
@@ -158,12 +159,12 @@ Firestore에 `feed_id`가 이미 존재하면 스킵하고 루프를 종료합�
 
 ### crawl.yml — 쿠폰 크롤링
 
-| cron | KST | 동작 |
-|---|---|---|
-| `7 0 * * *` | 09:07 | 폴링 루프 시작 → 11:30 KST까지 5분 간격 반복 크롤링 |
-| `7 8 * * *` | 17:07 | 저녁 단순 1회 크롤링 |
+| cron | KST 시작 | deadline | 동작 |
+|---|---|---|---|
+| `7 0 * * *` | 09:07 | 11:30 | 3분 간격 폴링 루프 |
+| `7 7 * * *` | 16:07 | 18:30 | 3분 간격 폴링 루프 |
 
-09:07 잡은 11:30 KST까지 5분 간격으로 폴링하며, 쿠폰 발견 즉시 저장 + FCM 발송합니다. 11:30까지 쿠폰이 없으면 자동 종료합니다. 저녁 잡은 단순 1회 실행입니다.
+GitHub Actions cron 딜레이(실측 평균 40~80분)를 우회하기 위해 폴링 루프 방식을 채택했습니다. 잡이 뜨는 순간부터 3분 간격으로 반복 크롤링하며, 쿠폰 발견 즉시 저장 + FCM 발송합니다. deadline까지 쿠폰이 없으면 자동 종료합니다.
 
 `workflow_dispatch`로 수동 실행도 가능합니다.
 
@@ -185,4 +186,11 @@ pip install -r requirements.txt
 python main.py
 ```
 
-GitHub Actions 환경에서는 `FIREBASE_KEY` Secret에 서비스 계정 JSON을 통째로 등록합니다.
+dev Firebase만 사용하려면 `DEV_ONLY=true` 환경변수를 설정합니다 (prod FCM 미발송).
+
+```cmd
+# Windows cmd
+set DEV_ONLY=true && python main.py
+```
+
+GitHub Actions 환경에서는 `FIREBASE_KEY` / `FIREBASE_KEY_DEV` Secret에 서비스 계정 JSON을 등록합니다.
