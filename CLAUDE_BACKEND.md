@@ -72,7 +72,7 @@ Ehrpis-helper-backend/
 | `rarity` | int | 성급 (1~5) |
 | `class_id` | int | 직업 ID (classes.json 참조) |
 | `element_id` | int | 속성 ID (elements.json 참조) |
-| `role_id` | int | 역할 ID (roles.json 참조) |
+| `role_ids` | array\<int\> | 역할 ID 목록 (roles.json 참조, 복수 허용) |
 | `is_limited` | bool | 한정 캐릭터 여부 |
 | `is_gacha` | bool | 가챠 풀 포함 여부 (획득 경로가 가챠가 아닌 캐릭터는 false) |
 | `icon_url` | string | jsDelivr CDN URL |
