@@ -8,8 +8,8 @@ os.chdir(ROOT)
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-KEY_FILES = [
-    # !!! main 머지 전 반드시 주석 해제 !!!
+DEV_ONLY = os.getenv("DEV_ONLY") == "true"
+KEY_FILES = [("serviceAccountKey_dev.json", "dev")] if DEV_ONLY else [
     ("serviceAccountKey.json", "prod"),
     ("serviceAccountKey_dev.json", "dev"),
 ]

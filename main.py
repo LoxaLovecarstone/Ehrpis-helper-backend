@@ -1,29 +1,26 @@
 import asyncio
+import datetime
 import os
 from crawler.coupon_crawler import fetch_coupon_posts
 from crawler.firebase_client import init_app, get_db, is_already_saved, is_coupon_expired, save_coupon, send_fcm_notification
 
-KEY_FILES = [
+DEV_ONLY = os.getenv("DEV_ONLY") == "true"
+KEY_FILES = [("serviceAccountKey_dev.json", "dev")] if DEV_ONLY else [
     ("serviceAccountKey.json", "prod"),
     ("serviceAccountKey_dev.json", "dev"),
 ]
 
+KST = datetime.timezone(datetime.timedelta(hours=9))
+POLL_INTERVAL = 180
 
-async def main():
-    print("크롤링 시작...")
+
+async def crawl_once(dbs, apps, prod_db):
+    print(f"[{datetime.datetime.now(KST).strftime('%H:%M:%S')}] 크롤링 시작")
     posts = await fetch_coupon_posts()
 
     if not posts:
         print("쿠폰 게시글 없음")
         return
-
-    apps = [
-        init_app(key_file, name)
-        for key_file, name in KEY_FILES
-        if os.path.exists(key_file)
-    ]
-    dbs = [get_db(app) for app in apps]
-    prod_db = dbs[0]
 
     new_count = 0
     for post in posts:
@@ -40,7 +37,30 @@ async def main():
             send_fcm_notification(post, app)
         new_count += 1
 
-    print(f"\n완료: 신규 {new_count}개 저장")
+    print(f"신규 {new_count}개 저장")
+
+
+async def main():
+    apps = [
+        init_app(key_file, name)
+        for key_file, name in KEY_FILES
+        if os.path.exists(key_file)
+    ]
+    dbs = [get_db(app) for app in apps]
+    prod_db = dbs[0]
+
+    deadline = datetime.datetime.now(KST).replace(hour=11, minute=30, second=0, microsecond=0)
+
+    while True:
+        try:
+            await crawl_once(dbs, apps, prod_db)
+        except Exception as e:
+            print(f"크롤링 에러 ({POLL_INTERVAL}초 후 재시도): {e}")
+        if datetime.datetime.now(KST) >= deadline:
+            break
+        await asyncio.sleep(POLL_INTERVAL)
+
+    print("11:30 KST 초과 → 종료")
 
 
 if __name__ == "__main__":
