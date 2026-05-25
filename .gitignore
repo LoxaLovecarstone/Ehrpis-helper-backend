@@ -186,3 +186,4 @@ pyrightconfig.json
 /serviceAccountKey.json
 /serviceAccountKey_dev.json
 /.claude/settings.local.json
+/mydocs/

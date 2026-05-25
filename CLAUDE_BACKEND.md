@@ -180,12 +180,22 @@ https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/com
 ## GitHub Actions
 ```yaml
 # crawl.yml 스케줄 (KST 기준)
-- cron: '7 1 * * *'    # 10:07
-- cron: '37 1 * * *'   # 10:37
-- cron: '7 2 * * *'    # 11:07
-- cron: '37 2 * * *'   # 11:37
-- cron: '7 8 * * *'    # 17:07
+- cron: '7 0 * * *'    # 09:07 — 폴링 루프 시작 (11:30 KST까지)
+- cron: '7 8 * * *'    # 17:07 — 저녁 단순 1회 크롤링
 
 # cleanup.yml
 - cron: '0 15 * * *'   # KST 00:00
+```
+
+## 폴링 루프 구조 (main.py — 구현 예정)
+
+09:07 잡이 시작되면 5분 간격으로 반복 크롤링. 새 쿠폰 발견 시 Firestore 저장 + FCM 발송 후에도 계속 폴링(하루 쿠폰 2개 이상 대비). 기존 feed_id dedup 로직이 중복 알림 차단. 11:30 KST 초과 시 "오늘은 쿠폰 없음"으로 exit.
+
+```python
+KST = datetime.timezone(datetime.timedelta(hours=9))
+DEADLINE = datetime.time(11, 30)
+
+while datetime.datetime.now(KST).time() < DEADLINE:
+    await crawl_once()          # 새 쿠폰이면 저장+FCM, 기존이면 dedup으로 스킵
+    await asyncio.sleep(300)    # 5분 간격 (time.sleep 아님 — async 필수)
 ```
