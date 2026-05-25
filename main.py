@@ -49,7 +49,11 @@ async def main():
     dbs = [get_db(app) for app in apps]
     prod_db = dbs[0]
 
-    deadline = datetime.datetime.now(KST).replace(hour=11, minute=30, second=0, microsecond=0)
+    now = datetime.datetime.now(KST)
+    if now.hour < 12:
+        deadline = now.replace(hour=11, minute=30, second=0, microsecond=0)
+    else:
+        deadline = now.replace(hour=18, minute=30, second=0, microsecond=0)
 
     while True:
         try:
@@ -60,7 +64,7 @@ async def main():
             break
         await asyncio.sleep(POLL_INTERVAL)
 
-    print("11:30 KST 초과 → 종료")
+    print(f"{deadline.strftime('%H:%M')} KST 초과 → 종료")
 
 
 if __name__ == "__main__":
