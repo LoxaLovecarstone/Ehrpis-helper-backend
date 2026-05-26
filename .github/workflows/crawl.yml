@@ -27,4 +27,4 @@ jobs:
           echo '${{ secrets.FIREBASE_KEY_DEV }}' > serviceAccountKey_dev.json
 
       - name: 크롤러 실행
-        run: python main.py
+        run: python -u main.py
