@@ -10,7 +10,7 @@
 - GitHub Actions는 `main` 브랜치 기준으로 동작
 
 ## 기술 스택
-- Python 3.13
+- Python 3.14
 - httpx, beautifulsoup4, firebase-admin, python-dotenv, emoji
 - GitHub Actions (스케줄러)
 - Firebase Firestore (쿠폰 저장)
@@ -211,6 +211,42 @@ while True:
 
 로컬 테스트 시 prod Firebase 격리용. CI에서는 설정하지 않음.
 
-```cmd
-set DEV_ONLY=true && python main.py
+```powershell
+$env:DEV_ONLY="true"; python main.py
+$env:DEV_ONLY="true"; python scripts/test_send_dummy.py  # FCM 테스트
+$env:DEV_ONLY="true"; python scripts/test_cleanup.py     # 테스트 데이터 정리
 ```
+
+---
+
+## GitHub Actions 딜레이 및 트리거 시각 고려사항
+
+### 실측 딜레이 (32일, 224회)
+- 아침 슬롯 (09:07 KST = 00:07 UTC): **39~78분** 지연
+- 저녁 슬롯 (16:07 KST = 07:07 UTC): 최대 88분 지연
+
+### 현재 구조의 한계
+쿠폰은 보통 **10:00 / 11:00 KST**에 올라옴. 09:07 cron이 78분 지연되면 루프가 10:25에야 시작 → 10:00 쿠폰을 25분 후 인지. 사용자 입장에서 10분 이내 알림 보장 불가.
+
+### 개선 후보 (미적용, 일주일 통계 후 결정)
+- cron을 **08:00 KST (23:00 UTC)**로 당기기
+  - 23:00 UTC는 자정 전이라 혼잡도 낮음
+  - 최악 78분 지연 시 09:18 시작 → 10:00 쿠폰을 3분 이내 감지
+  - deadline 11:30 유지로 11:00 쿠폰도 커버
+
+### Firestore 읽기 비용
+- 폴링 루프 기준 **~97 reads/일** (사이클당 1회, 첫 게시글이 이미 저장돼 있어 break)
+- 현재 36명 기준 클라이언트 조회 약 300 reads/일
+- 500명 기준 예상 ~4,264 reads/일 → 무료 한도(50,000/일) 내
+- 게임 전체 유저 2,000명 미만이라 비용 이슈 없음
+
+### 폴링 간격 변경 시 비교 (3분 vs 5분)
+
+| 항목 | 3분 (현재) | 5분 |
+|------|-----------|-----|
+| 아침 사이클 수 | ~47회 | ~28회 |
+| 저녁 사이클 수 | ~50회 | ~28회 |
+| 서버 reads/일 | ~97회 | ~56회 |
+| 쿠폰 최대 감지 지연 | 3분 | 5분 |
+
+결론: reads 차이는 41회로 비용 관점에선 의미 없음. 쿠폰 감지 지연이 최대 2분 늘어나는 게 유일한 트레이드오프인데, cron 자체 딜레이(39~78분)가 지배적이라 체감 차이도 없음. **현재 3분 유지가 합리적**.
