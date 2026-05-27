@@ -1,0 +1,20 @@
+[
+  { "name": "월정액1",        "price_per_pull": 363   },
+  { "name": "월정액2",        "price_per_pull": 1161  },
+  { "name": "초보자 한정 4",  "price_per_pull": 1400  },
+  { "name": "초보자 한정 2",  "price_per_pull": 1467  },
+  { "name": "이벤트 패스",    "price_per_pull": 1500  },
+  { "name": "월간 초특가",    "price_per_pull": 1773  },
+  { "name": "트럭 초회",      "price_per_pull": 1777  },
+  { "name": "이벤트 모집",    "price_per_pull": 1833  },
+  { "name": "초보자 한정 6",  "price_per_pull": 1875  },
+  { "name": "암시장",         "price_per_pull": 1950  },
+  { "name": "월간 모집 지원", "price_per_pull": 2100  },
+  { "name": "주간 모집 지원", "price_per_pull": 2200  },
+  { "name": "월간 비석",      "price_per_pull": 2975  },
+  { "name": "트럭",           "price_per_pull": 3554  },
+  { "name": "일일 상회 특가", "price_per_pull": 3750  },
+  { "name": "월간 모집 특가", "price_per_pull": 5880  },
+  { "name": "주간 레벨업",    "price_per_pull": 15000 },
+  { "name": "월간 레벨업",    "price_per_pull": 19800 }
+]

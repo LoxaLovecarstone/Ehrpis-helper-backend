@@ -1,0 +1,7 @@
+{
+  "five_star_rate": 0.02,
+  "four_star_rate": 0.10,
+  "three_star_rate": 0.30,
+  "pickup_rate": 0.50,
+  "pity_threshold": 65
+}

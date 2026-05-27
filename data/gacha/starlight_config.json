@@ -1,0 +1,10 @@
+{
+  "high_count_threshold": 7,
+  "rewards": [
+    { "rarity": 1, "type": "brilliant", "normal": 3,  "high": 5  },
+    { "rarity": 2, "type": "brilliant", "normal": 4,  "high": 7  },
+    { "rarity": 3, "type": "brilliant", "normal": 8,  "high": 12 },
+    { "rarity": 4, "type": "radiant",   "normal": 3,  "high": 7  },
+    { "rarity": 5, "type": "radiant",   "normal": 12, "high": 28 }
+  ]
+}
