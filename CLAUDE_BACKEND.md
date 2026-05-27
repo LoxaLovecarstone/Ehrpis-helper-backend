@@ -36,6 +36,10 @@ Ehrpis-helper-backend/
 │   │   ├── badges.json           ← 뱃지 10종
 │   │   ├── element_relations.json
 │   │   └── fever_config.json
+│   ├── gacha/
+│   │   ├── banner_config.json    ← 확률·천장 설정 (CDN 서빙)
+│   │   ├── starlight_config.json ← 별빛 수치 설정 (CDN 서빙)
+│   │   └── gacha_packages.json  ← 인앱 패키지 목록 (CDN 서빙)
 │   └── characters/
 │       ├── index.json            ← 캐릭터 목록 (경량, CDN 서빙)
 │       ├── icons/                ← 0001.png ~ 0066.png (172×172 투명 PNG)
@@ -75,6 +79,7 @@ Ehrpis-helper-backend/
 | `role_ids` | array\<int\> | 역할 ID 목록 (roles.json 참조, 복수 허용) |
 | `is_limited` | bool | 한정 캐릭터 여부 |
 | `is_gacha` | bool | 가챠 풀 포함 여부 (획득 경로가 가챠가 아닌 캐릭터는 false) |
+| `is_standard_pool` | bool | 상시 편입 여부. 한정(`is_limited:true`) 및 비가챠(`is_gacha:false`)는 false |
 | `icon_url` | string | jsDelivr CDN URL |
 
 ### 개별 캐릭터 JSON (0001.json ~ 0066.json)
@@ -163,6 +168,9 @@ https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/cha
 https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/characters/0001.json
 https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/characters/icons/0001.png
 https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/common/classes.json
+https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/gacha/banner_config.json
+https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/gacha/starlight_config.json
+https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/gacha/gacha_packages.json
 ```
 
 ## 안드로이드 연동 시 참고사항
@@ -180,8 +188,8 @@ https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/com
 ## GitHub Actions
 ```yaml
 # crawl.yml 스케줄 (KST 기준)
-- cron: '7 0 * * *'    # 09:07 — 아침 폴링 루프 (11:30까지)
-- cron: '7 7 * * *'    # 16:07 — 저녁 폴링 루프 (18:30까지)
+- cron: '30 23 * * *'  # 08:30 — 아침 폴링 루프 (11:20까지)
+- cron: '30 6 * * *'   # 15:30 — 저녁 폴링 루프 (18:00까지)
 
 # cleanup.yml
 - cron: '0 15 * * *'   # KST 00:00
@@ -189,16 +197,16 @@ https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/com
 
 ## 폴링 루프 구조 (main.py)
 
-잡이 시작되면 3분 간격으로 반복 크롤링. 시작 시각 기준으로 deadline 자동 결정 (12시 전 → 11:30, 이후 → 18:30). 새 쿠폰 발견 시 Firestore 저장 + FCM 발송 후에도 계속 폴링 (하루 쿠폰 2개 이상 대비). feed_id dedup 로직이 중복 알림 차단.
+잡이 시작되면 5분 간격으로 반복 크롤링. 시작 시각 기준으로 deadline 자동 결정 (12시 전 → 11:20, 이후 → 18:00). 새 쿠폰 발견 시 Firestore 저장 + FCM 발송 후에도 계속 폴링 (하루 쿠폰 2개 이상 대비). feed_id dedup 로직이 중복 알림 차단.
 
 ```python
-POLL_INTERVAL = 180  # 3분
+POLL_INTERVAL = 300  # 5분
 
 now = datetime.datetime.now(KST)
 if now.hour < 12:
-    deadline = now.replace(hour=11, minute=30, ...)
+    deadline = now.replace(hour=11, minute=20, ...)
 else:
-    deadline = now.replace(hour=18, minute=30, ...)
+    deadline = now.replace(hour=18, minute=0, ...)
 
 while True:
     await crawl_once()

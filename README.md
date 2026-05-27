@@ -2,7 +2,8 @@
 
 모바일 게임 `에르피스`를 도와주는 `에르피스 도우미` 앱의 백엔드입니다.
 
-네이버 게임 라운지를 주기적으로 크롤링해 쿠폰 게시글을 감지하고, Firestore에 저장 후 FCM으로 푸시 알림을 발송합니다.
+네이버 게임 라운지를 주기적으로 모니터링해 쿠폰 게시글을 감지하고, Firestore에 저장 후 FCM으로 푸시 알림을 발송합니다.
+캐릭터 데이터 및 가챠 설정은 jsDelivr CDN을 통해 앱에 서빙합니다.
 
 별도 서버 없이 **GitHub Actions + Firebase** 로 작동합니다.
 
@@ -12,8 +13,8 @@
 
 ```
 [GitHub Actions 스케줄러]
-        │  오전: 09:07 KST 시작 → 3분 간격 폴링 → 11:30 종료
-        │  오후: 16:07 KST 시작 → 3분 간격 폴링 → 18:30 종료
+        │  오전: 08:30 KST 시작 → 5분 간격 모니터링 → 11:20 종료
+        │  오후: 15:30 KST 시작 → 5분 간격 모니터링 → 18:00 종료
         ▼
 [coupon_crawler.py]
   네이버 라운지 API 목록 조회
@@ -40,15 +41,16 @@
 
 ## 기술 스택
 
-| 영역 | 기술                             |
-|---|--------------------------------|
-| 언어 | Python 3.14                    |
-| HTTP 클라이언트 | httpx (비동기)                    |
-| HTML 파싱 | BeautifulSoup4                 |
-| 이모지 처리 | emoji                          |
-| 데이터베이스 | Firebase Firestore             |
+| 영역 | 기술 |
+|---|---|
+| 언어 | Python 3.14 |
+| HTTP 클라이언트 | httpx (비동기) |
+| HTML 파싱 | BeautifulSoup4 |
+| 이모지 처리 | emoji |
+| 데이터베이스 | Firebase Firestore |
 | 푸시 알림 | Firebase Cloud Messaging (FCM) |
-| 스케줄러 | GitHub Actions                 |
+| 스케줄러 | GitHub Actions |
+| CDN | jsDelivr (캐릭터 데이터 서빙) |
 
 ---
 
@@ -58,11 +60,25 @@
 Ehrpis-helper-backend/
 ├── .github/
 │   └── workflows/
-│       ├── crawl.yml               ← 쿠폰 크롤링 (KST 09:07 / 16:07 폴링 루프)
+│       ├── crawl.yml               ← 쿠폰 크롤링 (08:30 / 15:30 KST 모니터링 루프)
 │       └── cleanup.yml             ← 만료 쿠폰 삭제 스케줄 (매일 KST 00:00)
 ├── crawler/
 │   ├── coupon_crawler.py           ← 네이버 라운지 크롤링 + 파싱
 │   └── firebase_client.py          ← Firestore 저장 + FCM 발송
+├── data/
+│   ├── common/
+│   │   ├── classes.json            ← 직업 (수호/돌격/언령/사수)
+│   │   ├── elements.json           ← 속성 (수/화/목/광/암)
+│   │   ├── roles.json              ← 역할 (딜러/탱커/힐러/서포터)
+│   │   └── ...
+│   ├── characters/
+│   │   ├── index.json              ← 캐릭터 목록 (경량, CDN 서빙)
+│   │   ├── icons/                  ← 0001.png ~ 0066.png (172×172 투명 PNG)
+│   │   └── 0001.json ~ 0066.json  ← 개별 캐릭터 상세 (lazy load용)
+│   └── gacha/
+│       ├── banner_config.json      ← 확률·천장 설정 (CDN 서빙)
+│       ├── starlight_config.json   ← 별빛 수치 설정 (CDN 서빙)
+│       └── gacha_packages.json     ← 인앱 패키지 목록 (CDN 서빙)
 ├── scripts/
 │   └── cleanup_expired_coupons.py  ← 만료 쿠폰 Hard Delete
 ├── main.py                         ← 진입점
@@ -159,12 +175,12 @@ Firestore에 `feed_id`가 이미 존재하면 스킵하고 루프를 종료합�
 
 ### crawl.yml — 쿠폰 크롤링
 
-| cron | KST 시작 | deadline | 동작 |
+| cron (UTC) | KST 시작 | deadline | 동작 |
 |---|---|---|---|
-| `7 0 * * *` | 09:07 | 11:30 | 3분 간격 폴링 루프 |
-| `7 7 * * *` | 16:07 | 18:30 | 3분 간격 폴링 루프 |
+| `30 23 * * *` | 08:30 | 11:20 | 5분 간격 모니터링 루프 |
+| `30 6 * * *` | 15:30 | 18:00 | 5분 간격 모니터링 루프 |
 
-GitHub Actions cron 딜레이(실측 평균 40~80분)를 우회하기 위해 폴링 루프 방식을 채택했습니다. 잡이 뜨는 순간부터 3분 간격으로 반복 크롤링하며, 쿠폰 발견 즉시 저장 + FCM 발송합니다. deadline까지 쿠폰이 없으면 자동 종료합니다.
+GitHub Actions cron 딜레이(실측 평균 40~80분)를 우회하기 위해 모니터링 루프 방식을 채택했습니다. 잡이 뜨는 순간부터 5분 간격으로 반복 크롤링하며, 쿠폰 발견 즉시 저장 + FCM 발송합니다. deadline까지 쿠폰이 없으면 자동 종료합니다.
 
 `workflow_dispatch`로 수동 실행도 가능합니다.
 
@@ -174,6 +190,24 @@ GitHub Actions cron 딜레이(실측 평균 40~80분)를 우회하기 위해 폴
 `soft delete`도 고려하였으나 어차피 만료된 쿠폰을 다시는 사용하지 못하는 점, 무료 요금제를 이용 중이라는 조건에 맞추어 타협하였습니다.
 
 `workflow_dispatch`로 수동 실행도 가능합니다.
+
+---
+
+## CDN 서빙 (캐릭터 데이터)
+
+캐릭터 데이터와 가챠 설정은 GitHub 레포를 jsDelivr CDN으로 서빙합니다. 앱이 서버 없이 직접 fetch합니다.
+
+```
+베이스 URL: https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/
+
+data/characters/index.json         ← 전체 캐릭터 목록 (66명)
+data/characters/icons/0001.png     ← 캐릭터 아이콘
+data/gacha/banner_config.json      ← 확률·천장 설정
+data/gacha/starlight_config.json   ← 별빛 수치 설정
+data/gacha/gacha_packages.json     ← 인앱 패키지 목록
+```
+
+main 브랜치에 머지하면 CDN에 자동 반영됩니다 (캐시 최대 24시간).
 
 ---
 
@@ -188,9 +222,9 @@ python main.py
 
 dev Firebase만 사용하려면 `DEV_ONLY=true` 환경변수를 설정합니다 (prod FCM 미발송).
 
-```cmd
-# Windows cmd
-set DEV_ONLY=true && python main.py
+```powershell
+# Windows PowerShell
+$env:DEV_ONLY="true"; python main.py
 ```
 
 GitHub Actions 환경에서는 `FIREBASE_KEY` / `FIREBASE_KEY_DEV` Secret에 서비스 계정 JSON을 등록합니다.
