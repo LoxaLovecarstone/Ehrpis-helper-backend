@@ -2,14 +2,14 @@ name: 쿠폰 크롤러
 
 on:
   schedule:
-    - cron: '7 0 * * *'   # 09:07 KST — 폴링 루프 (11:30까지)
-    - cron: '7 7 * * *'   # 16:07 KST — 저녁 폴링 루프 (18:30까지)
+    - cron: '30 23 * * *'  # 08:30 KST — 아침 폴링 루프 (11:20까지)
+    - cron: '30 6 * * *'   # 15:30 KST — 저녁 폴링 루프 (18:00까지)
   workflow_dispatch:
 
 jobs:
   crawl:
     runs-on: ubuntu-latest
-    timeout-minutes: 160
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
 

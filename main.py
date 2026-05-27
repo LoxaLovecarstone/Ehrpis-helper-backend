@@ -11,7 +11,7 @@ KEY_FILES = [("serviceAccountKey_dev.json", "dev")] if DEV_ONLY else [
 ]
 
 KST = datetime.timezone(datetime.timedelta(hours=9))
-POLL_INTERVAL = 180
+POLL_INTERVAL = 300
 
 
 async def crawl_once(dbs, apps, prod_db):
@@ -51,9 +51,9 @@ async def main():
 
     now = datetime.datetime.now(KST)
     if now.hour < 12:
-        deadline = now.replace(hour=11, minute=30, second=0, microsecond=0)
+        deadline = now.replace(hour=11, minute=20, second=0, microsecond=0)
     else:
-        deadline = now.replace(hour=18, minute=30, second=0, microsecond=0)
+        deadline = now.replace(hour=18, minute=0, second=0, microsecond=0)
 
     while True:
         try:
