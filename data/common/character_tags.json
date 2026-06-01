@@ -1,0 +1,31 @@
+[
+  { "id": 101, "name_ko": "단일",          "category": "damage" },
+  { "id": 102, "name_ko": "광역",          "category": "damage" },
+  { "id": 103, "name_ko": "지속",          "category": "damage" },
+
+  { "id": 201, "name_ko": "자신 회복",     "category": "tank"   },
+  { "id": 202, "name_ko": "자신 보호막",   "category": "tank"   },
+  { "id": 203, "name_ko": "자신 방어",     "category": "tank"   },
+  { "id": 204, "name_ko": "자신 부활",     "category": "tank"   },
+  { "id": 205, "name_ko": "피해 반사",     "category": "tank"   },
+  { "id": 206, "name_ko": "CC 면역",       "category": "tank"   },
+  { "id": 207, "name_ko": "도발",          "category": "tank"   },
+  { "id": 208, "name_ko": "피해 분산",     "category": "tank"   },
+
+  { "id": 301, "name_ko": "아군 강화",     "category": "buff"   },
+  { "id": 302, "name_ko": "아군 보호막",   "category": "buff"   },
+  { "id": 303, "name_ko": "아군 회복",     "category": "buff"   },
+  { "id": 304, "name_ko": "아군 방어",     "category": "buff"   },
+  { "id": 305, "name_ko": "아군 부활",     "category": "buff"   },
+
+  { "id": 401, "name_ko": "방어력 감소",   "category": "debuff" },
+  { "id": 402, "name_ko": "공격력 감소",   "category": "debuff" },
+  { "id": 403, "name_ko": "공속 감소",     "category": "debuff" },
+  { "id": 404, "name_ko": "회복량 감소",   "category": "debuff" },
+  { "id": 405, "name_ko": "기절",          "category": "debuff" },
+  { "id": 406, "name_ko": "시간 정지",     "category": "debuff" },
+  { "id": 407, "name_ko": "침묵",          "category": "debuff" },
+  { "id": 408, "name_ko": "석화",          "category": "debuff" },
+
+  { "id": 501, "name_ko": "유틸리티",      "category": "util"   }
+]
