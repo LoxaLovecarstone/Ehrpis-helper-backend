@@ -4,7 +4,7 @@ import sys
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-BASE = os.path.join(os.path.dirname(__file__), "..", "data")
+BASE = os.path.join(os.path.dirname(__file__), "..", "..", "data")
 
 
 def load(path):

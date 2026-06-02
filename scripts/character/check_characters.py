@@ -1,7 +1,7 @@
 import json
 import os
 
-base = os.path.dirname(os.path.abspath(__file__))
+base = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 with open(os.path.join(base, 'data/characters/index.json'), encoding='utf-8') as f:
     characters = json.load(f)

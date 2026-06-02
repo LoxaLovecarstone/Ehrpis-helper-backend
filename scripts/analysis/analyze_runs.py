@@ -1,7 +1,10 @@
 import csv
 import json
+import os
 from collections import defaultdict
 from datetime import datetime
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 CRON_SLOTS = [
     ((1, 7),  "10:07 KST"),
@@ -11,7 +14,7 @@ CRON_SLOTS = [
     ((8, 7),  "17:07 KST"),
 ]
 
-with open("runs.json", encoding="utf-8") as f:
+with open(os.path.join(ROOT, "scripts", "analysis", "runs.json"), encoding="utf-8") as f:
     runs = json.load(f)
 
 scheduled = sorted(
@@ -50,7 +53,7 @@ for d, times in by_date.items():
             "delay_min": round(delay, 1),
         })
 
-CSV_PATH = "mydocs/github_actions_delays.csv"
+CSV_PATH = os.path.join(ROOT, "mydocs", "github_actions_delays.csv")
 with open(CSV_PATH, "w", newline="", encoding="utf-8") as f:
     writer = csv.DictWriter(f, fieldnames=["date", "slot", "expected_utc", "actual_utc", "delay_min"])
     writer.writeheader()
@@ -78,7 +81,7 @@ for _, label in CRON_SLOTS:
         "max_min": round(max(delays), 1),
     })
 
-SUMMARY_PATH = "mydocs/github_actions_delays_summary.csv"
+SUMMARY_PATH = os.path.join(ROOT, "mydocs", "github_actions_delays_summary.csv")
 with open(SUMMARY_PATH, "w", newline="", encoding="utf-8") as f:
     writer = csv.DictWriter(f, fieldnames=["slot", "count", "avg_min", "min_min", "max_min"])
     writer.writeheader()

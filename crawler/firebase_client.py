@@ -7,6 +7,9 @@ KST = timezone(timedelta(hours=9))
 
 _apps: dict = {}
 
+APP_DATA = "app_data"
+ACTIVE_COUPONS = "active_coupons"
+
 
 def init_app(key_file: str, name: str) -> firebase_admin.App:
     if name in _apps:
@@ -31,13 +34,21 @@ def is_coupon_expired(expiry_end: str | None) -> bool:
         return False
 
 
-def is_already_saved(feed_id: int, db) -> bool:
-    doc = db.collection("coupons").document(str(feed_id)).get()
-    return doc.exists
+def get_saved_feed_ids(db) -> set:
+    """active_coupons를 1회 읽어 feed_id set 반환. 루프 전 한 번만 호출."""
+    doc = db.collection(APP_DATA).document(ACTIVE_COUPONS).get()
+    if not doc.exists:
+        return set()
+    items = doc.get("items") or []
+    return {item["feed_id"] for item in items}
+
+
+def is_already_saved(feed_id: int, cached_ids: set) -> bool:
+    return feed_id in cached_ids
 
 
 def save_coupon(post: dict, db):
-    db.collection("coupons").document(str(post["feed_id"])).set({
+    item = {
         "feed_id": post["feed_id"],
         "title": post["title"],
         "coupons": post["coupons"],
@@ -46,8 +57,14 @@ def save_coupon(post: dict, db):
         "link": post["link"],
         "reward_types": post.get("reward_types", []),
         "created_date": post["created_date"],
-        "notified": False,
-    })
+    }
+    db.collection(APP_DATA).document(ACTIVE_COUPONS).set(
+        {
+            "items": firestore.ArrayUnion([item]),
+            "updated_at": firestore.SERVER_TIMESTAMP,
+        },
+        merge=True,
+    )
     print(f"저장 완료: {post['title']}")
 
 
