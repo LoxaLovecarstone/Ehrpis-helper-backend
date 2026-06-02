@@ -5,7 +5,8 @@ from datetime import datetime, timezone, timedelta
 
 KST = timezone(timedelta(hours=9))
 
-KEY_FILES = [
+DEV_ONLY = os.getenv("DEV_ONLY") == "true"
+KEY_FILES = [("serviceAccountKey_dev.json", "dev")] if DEV_ONLY else [
     ("serviceAccountKey.json", "prod"),
     ("serviceAccountKey_dev.json", "dev"),
 ]

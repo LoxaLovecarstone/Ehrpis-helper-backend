@@ -11,7 +11,7 @@ DUMMY_POST = {
     "feed_id": 99999,
     "title": "[테스트] 더미 쿠폰",
     "coupons": ["TESTCODE123"],
-    "expiry": {"start": "2026-04-30", "end": "2026-12-31 23:59"},
+    "expiry": {"start": "2026-04-30", "end": "2026-06-01 23:59"},
     "link": "https://game.naver.com/lounge/Ehrpis/board/25",
     "reward_types": [],
     "created_date": "2026-04-30",

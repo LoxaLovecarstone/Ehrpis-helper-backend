@@ -39,7 +39,7 @@ def get_saved_feed_ids(db) -> set:
     doc = db.collection(APP_DATA).document(ACTIVE_COUPONS).get()
     if not doc.exists:
         return set()
-    items = doc.get("items") or []
+    items = (doc.to_dict() or {}).get("items") or []
     return {item["feed_id"] for item in items}
 
 
