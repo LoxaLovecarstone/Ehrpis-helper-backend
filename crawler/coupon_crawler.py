@@ -28,10 +28,11 @@ def is_coupon_post(title: str) -> bool:
 def extract_coupons_from_html(html: str) -> list[str]:
     """본문 HTML에서 쿠폰 코드 추출"""
     soup = BeautifulSoup(html, "html.parser")
-    text = soup.get_text()
+    # separator=' ': 태그 경계마다 공백 삽입 → 한글이 \w라 \b가 깨지는 문제 방지
+    text = soup.get_text(separator=' ')
 
-    # "코드명: [GIFTS0406]" 패턴
-    pattern1 = re.findall(r'코드명[^\w]*\[?([A-Z0-9]{4,20})\]?', text)
+    # "코드명: [GIFTS0406]" 또는 "쿠폰 코드 : MYHEART" 패턴
+    pattern1 = re.findall(r'(?:코드명|쿠폰\s*코드)[^\w]*\[?([A-Z0-9]{4,20})\]?', text)
 
     # 대문자+숫자 조합 6~20자리 (일반 패턴)
     pattern2 = re.findall(r'\b[A-Z][A-Z0-9]{5,19}\b', text)

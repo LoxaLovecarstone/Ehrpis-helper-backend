@@ -110,10 +110,14 @@ GET https://comm-api.game.naver.com/nng_main/v1/community/lounge/Ehrpis/feed/{fe
 
 **쿠폰 코드** — 정규식 이중 패턴:
 ```python
-pattern1 = re.findall(r'코드명[^\w]*\[?([A-Z0-9]{4,20})\]?', text)   # "코드명: [GIFTS0406]"
-pattern2 = re.findall(r'\b[A-Z][A-Z0-9]{5,19}\b', text)              # 대문자+숫자 조합
+text = soup.get_text(separator=' ')  # 태그 경계에 공백 삽입 (한글 \b 오작동 방지)
+
+pattern1 = re.findall(r'(?:코드명|쿠폰\s*코드)[^\w]*\[?([A-Z0-9]{4,20})\]?', text)  # "코드명: [GIFTS0406]" / "쿠폰 코드 : MYHEART"
+pattern2 = re.findall(r'\b[A-Z][A-Z0-9]{5,19}\b', text)                             # 대문자+숫자 조합 fallback
 ```
 pattern1 우선 적용 후 중복을 제거합니다.
+
+> **주의:** `get_text()` 기본값은 태그 경계를 공백 없이 이어붙이기 때문에 한글 직후에 쿠폰 코드가 붙어 `\b`(word boundary)가 동작하지 않습니다. Python 3에서 한글은 `\w`로 분류되므로, `separator=' '`로 태그 경계마다 공백을 삽입해야 합니다.
 
 **만료일** — `보상 수령 기간` 또는 `쿠폰 사용 기간` 뒤에 오는 날짜 범위를 추출합니다.
 `2026-04-06 ~ 2026-04-08 23:59` 형태이며, `YYYY-MM-DD` / `YYYY.MM.DD` 두 형태 모두 파싱합니다.
