@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import os
 from crawler.coupon_crawler import fetch_coupon_posts
-from crawler.firebase_client import init_app, get_db, get_saved_feed_ids, is_already_saved, is_coupon_expired, save_coupon, send_fcm_notification
+from crawler.firebase_client import init_app, get_db, get_saved_feed_ids, is_already_saved, is_coupon_expired, save_coupon, save_coupon_legacy, send_fcm_notification
 
 DEV_ONLY = os.getenv("DEV_ONLY") == "true"
 KEY_FILES = [("serviceAccountKey_dev.json", "dev")] if DEV_ONLY else [
@@ -35,6 +35,7 @@ async def crawl_once(dbs, apps, prod_db):
 
         for db, app in zip(dbs, apps):
             save_coupon(post, db)
+            save_coupon_legacy(post, db)
             send_fcm_notification(post, app)
         cached_ids.add(post["feed_id"])
         new_count += 1

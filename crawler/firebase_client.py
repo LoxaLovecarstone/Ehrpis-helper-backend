@@ -47,6 +47,22 @@ def is_already_saved(feed_id: int, cached_ids: set) -> bool:
     return feed_id in cached_ids
 
 
+def save_coupon_legacy(post: dict, db):
+    """구버전 앱(coupons 컬렉션) 호환용. 신버전 배포 완료 후 제거."""
+    db.collection("coupons").document(str(post["feed_id"])).set({
+        "feed_id": post["feed_id"],
+        "title": post["title"],
+        "coupons": post["coupons"],
+        "expiry_start": post["expiry"]["start"],
+        "expiry_end": post["expiry"]["end"],
+        "link": post["link"],
+        "reward_types": post.get("reward_types", []),
+        "created_date": post["created_date"],
+        "notified": False,
+    })
+    print(f"[legacy] 저장 완료: {post['title']}")
+
+
 def save_coupon(post: dict, db):
     item = {
         "feed_id": post["feed_id"],
