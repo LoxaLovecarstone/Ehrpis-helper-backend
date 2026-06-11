@@ -155,7 +155,7 @@
   },
   {
     "id": 23, "name_ko": "니키타", "name_en": "", "rarity": 5,
-    "class_id": 1, "role_ids": [2], "element_id": 2,
+    "class_id": 1, "role_ids": [1], "element_id": 2,
     "is_limited": false, "is_gacha": true, "is_standard_pool": true,
     "icon_url": "https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/characters/icons/0023.png",
     "tag_ids": [102, 103, 202]
@@ -460,5 +460,12 @@
     "is_limited": false, "is_gacha": true, "is_standard_pool": true,
     "icon_url": "https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/characters/icons/0066.png",
     "tag_ids": [101, 103]
+  },
+  {
+    "id": 67, "name_ko": "필리아", "name_en": "", "rarity": 5,
+    "class_id": 3, "role_ids": [3, 4], "element_id": 3,
+    "is_limited": false, "is_gacha": true, "is_standard_pool": false,
+    "icon_url": "https://cdn.jsdelivr.net/gh/LoxaLovecarstone/Ehrpis-helper-backend@main/data/characters/icons/0067.png",
+    "tag_ids": [102, 303, 401]
   }
 ]
