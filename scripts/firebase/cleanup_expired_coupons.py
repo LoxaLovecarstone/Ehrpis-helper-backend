@@ -13,10 +13,11 @@ KEY_FILES = [("serviceAccountKey_dev.json", "dev")] if DEV_ONLY else [
 
 APP_DATA = "app_data"
 ACTIVE_COUPONS = "active_coupons"
+LEGACY_COUPONS = "coupons"
+BATCH_SIZE = 500
 
 
-def _is_expired(item: dict, now: datetime) -> bool:
-    expiry_end = item.get("expiry_end")
+def _is_expired(expiry_end: str | None, now: datetime) -> bool:
     if not expiry_end:
         return False
     try:
@@ -24,6 +25,27 @@ def _is_expired(item: dict, now: datetime) -> bool:
         return expiry_dt < now
     except ValueError:
         return False
+
+
+def cleanup_legacy(db) -> int:
+    now = datetime.now(KST)
+    to_delete = []
+    for doc in db.collection(LEGACY_COUPONS).stream():
+        expiry_end = doc.get("expiry_end")
+        if not expiry_end:
+            continue
+        try:
+            expiry_dt = datetime.strptime(expiry_end, "%Y-%m-%d %H:%M").replace(tzinfo=KST)
+            if expiry_dt < now:
+                to_delete.append(doc.reference)
+        except ValueError:
+            continue
+    for i in range(0, len(to_delete), BATCH_SIZE):
+        batch = db.batch()
+        for ref in to_delete[i: i + BATCH_SIZE]:
+            batch.delete(ref)
+        batch.commit()
+    return len(to_delete)
 
 
 def cleanup(db) -> int:
@@ -39,7 +61,7 @@ def cleanup(db) -> int:
         if not doc.exists:
             return 0
         items = doc.get("items") or []
-        active = [item for item in items if not _is_expired(item, now)]
+        active = [item for item in items if not _is_expired(item.get("expiry_end"), now)]
         expired_count = len(items) - len(active)
         if expired_count > 0:
             transaction.update(ref, {
@@ -61,9 +83,15 @@ def main():
         db = firestore.client(app=app)
         deleted = cleanup(db)
         if deleted:
-            print(f"[{name}] 삭제 완료: {deleted}개")
+            print(f"[{name}] active_coupons 삭제 완료: {deleted}개")
         else:
-            print(f"[{name}] 삭제할 만료 쿠폰 없음")
+            print(f"[{name}] active_coupons 삭제할 만료 쿠폰 없음")
+
+        deleted_legacy = cleanup_legacy(db)
+        if deleted_legacy:
+            print(f"[{name}] legacy coupons 삭제 완료: {deleted_legacy}개")
+        else:
+            print(f"[{name}] legacy coupons 삭제할 만료 쿠폰 없음")
 
 
 if __name__ == "__main__":
