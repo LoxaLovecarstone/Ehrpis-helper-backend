@@ -21,10 +21,6 @@ def clean_title(title: str) -> str:
     return title.strip()
 
 
-def is_coupon_post(title: str) -> bool:
-    return "[리딤]" in title
-
-
 def extract_coupons_from_html(html: str) -> list[str]:
     """본문 HTML에서 쿠폰 코드 추출"""
     soup = BeautifulSoup(html, "html.parser")
@@ -91,7 +87,17 @@ def extract_expiry(html: str) -> dict:
     }
 
 
-async def fetch_coupon_posts() -> list[dict]:
+async def fetch_coupon_posts(known_feed_ids: set = frozenset()) -> list[dict]:
+    """지원 코드 게시판(boardId=25)을 최신순으로 순회하며 쿠폰 게시글을 수집한다.
+
+    게시판 자체가 지원 코드 전용이라 제목 헤더(예: "[리딤]")로는 필터링하지 않고,
+    본문에서 실제 쿠폰 코드가 추출되는 게시글만 채택한다. "[리딤]" 같은 고정 헤더가
+    없는 제목(예: "고스트킹 합류 기념 특별 쿠폰")도 이 방식이면 놓치지 않는다.
+
+    게시글은 최신순 정렬이므로, 이미 저장된 feed_id(known_feed_ids)를 만나면
+    그 이후는 전부 과거 게시글이라 즉시 순회를 멈춘다 (매 폴링마다 게시판 전체
+    이력을 상세 조회하지 않기 위함).
+    """
     async with httpx.AsyncClient(headers=HEADERS) as client:
         coupon_posts = []
         page_offset = 0
@@ -104,16 +110,15 @@ async def fetch_coupon_posts() -> list[dict]:
             data = resp.json()["content"]
 
             feeds = data["feeds"]
-            total = data["totalCount"]
 
             for item in feeds:
                 feed = item["feed"]
-                title = clean_title(feed.get("title", ""))
-
-                if not is_coupon_post(title):
-                    continue
-
                 feed_id = feed["feedId"]
+
+                if feed_id in known_feed_ids:
+                    return coupon_posts
+
+                title = clean_title(feed.get("title", ""))
 
                 detail_resp = await client.get(
                     DETAIL_API.format(feed_id=feed_id)
@@ -123,6 +128,9 @@ async def fetch_coupon_posts() -> list[dict]:
 
                 contents_html = detail.get("contents", "")
                 coupons = extract_coupons_from_html(contents_html)
+                if not coupons:
+                    continue
+
                 expiry = extract_expiry(contents_html)
                 reward_types = extract_reward_types(contents_html)
 

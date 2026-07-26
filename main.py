@@ -16,13 +16,13 @@ POLL_INTERVAL = 300
 
 async def crawl_once(dbs, apps, prod_db):
     print(f"[{datetime.datetime.now(KST).strftime('%H:%M:%S')}] 크롤링 시작")
-    posts = await fetch_coupon_posts()
+    cached_ids = get_saved_feed_ids(prod_db)
+    posts = await fetch_coupon_posts(cached_ids)
 
     if not posts:
         print("쿠폰 게시글 없음")
         return
 
-    cached_ids = get_saved_feed_ids(prod_db)
     new_count = 0
     for post in posts:
         if is_coupon_expired(post["expiry"]["end"]):

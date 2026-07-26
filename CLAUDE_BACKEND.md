@@ -115,11 +115,11 @@ Ehrpis-helper-backend/
 ```
 
 ### 쿠폰 감지 조건
-- `feed.title`에 `[리딤]` 포함
-- 본문 HTML에서 쿠폰 코드 추출
+- 게시판(`boardId=25`)이 이미 지원 코드 전용이라 제목 헤더로는 필터링하지 않음 (과거 `[리딤]` 필터는 헤더 없는 제목을 놓쳐서 제거)
+- 본문 HTML에서 쿠폰 코드가 실제로 추출되는 게시글만 채택
 
 ### 중복 방지
-Firestore에 `feed_id` 기준으로 저장. 이미 존재하면 스킵 후 `break`.
+Firestore `active_coupons`에서 저장된 `feed_id` 집합을 미리 읽어 `fetch_coupon_posts(known_feed_ids)`에 전달. 목록 조회 중(최신순) 이미 아는 `feed_id`를 만나면 즉시 순회 중단.
 
 ---
 
